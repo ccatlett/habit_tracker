@@ -7,6 +7,9 @@ app = Flask(__name__)
 # --- Database Configuration ---
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///habit_tracker.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['SECRET_KEY'] = 'my_super_secret_string_12345'
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = False
 
 db = SQLAlchemy(app)
 
@@ -159,4 +162,4 @@ with app.app_context():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+     app.run(host='127.0.0.1', port=5000, debug=False)
