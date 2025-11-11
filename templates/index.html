@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>C's Week: {{ week_dates[0].strftime('%B %d, %Y') }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Jacquard+12&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Consolas', monospace;
+        background: #fffaf5;
+        color: #333;
+        max-width: 1000px;
+        margin: 1em auto;
+        line-height: 1.4;
+    }
+    h1 {
+        font-family: 'Jacquard 12', static;
+        text-align: center;
+        font-weight: 400;
+        color: #7c3aed;
+        margin-bottom: .05em;
+        margin-top: .05em;
+        font-size: 5.5em; /* make it bigger */
+    }
+
+    /* Add habit form */
+    .add-form {
+        font-family: 'Consolas', monospace;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 2em;
+    }
+    .add-form input, .add-form select {
+        font-family: 'Consolas', monospace;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        font-size: 12px;
+    }
+    .add-form button {
+        font-family: 'Consolas', monospace;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        background-color: #a78bfa;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .add-form button:hover {
+        background-color: #7c3aed;
+    }
+
+    /* Tracker layout */
+    .tracker-container {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+    }
+
+    table {
+        border-collapse: separate;
+        border-spacing: 0 8px; /* vertical spacing between rows */
+        width: 70%;
+    }
+    th, td {
+        padding: 10px 12px;
+        text-align: center;
+    }
+    th {
+        font-weight: 600;
+        color: #7c3aed;
+    }
+    td {
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 12px;
+    }
+    tr.habit-row {
+        height: 40px; /* fixed height for alignment */
+    }
+    input[type="checkbox"] {
+        transform: scale(1.3);
+        cursor: pointer;
+    }
+
+    /* Ellipsis menu */
+    .ellipsis-container {
+        position: relative;
+        display: inline-block;
+    }
+    .ellipsis-btn {
+        background: none;
+        border: none;
+        font-weight: 600;
+        font-size: 12px;
+        cursor: pointer;
+        color: #6b7280;
+    }
+    .menu {
+    font-family: 'Consolas', monospace;
+    display: none;           /* hidden initially */
+    position: absolute;
+    top: 22px;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    min-width: 120px;
+    z-index: 100;
+    overflow: hidden;
+    flex-direction: column;  /* keep flex layout, but don't overwrite display:none */
+}
+
+    .menu a, .menu form button {
+    font-family: 'Consolas', monospace;
+    display: block;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #374151;
+    font-size: 14px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 6px; /* <-- add this */
+}
+.menu a:hover, .menu form button:hover {
+    background: #f3f4f6;
+    border-radius: 6px; /* <-- add this so hover also has rounded corners */
+}
+
+    /* Progress card */
+    .progress-card {
+        width: 25%;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .progress-card h3 {
+        margin-top: 0;
+        font-size: 16px;
+        color: #7c3aed;
+        text-align: center;
+        margin-bottom: 12px;
+    }
+    .progress-bar {
+        height: 40px; /* same as table row height */
+        background: #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 8px;
+    }
+    .progress-fill {
+        height: 100%;
+        background: #a78bfa;
+        transition: width 0.3s ease;
+        border-radius: 8px;
+        text-align: center;
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 40px;
+    }
+
+    /* Reset week button */
+    .reset-btn {
+        font-family: 'Consolas', monospace;
+        display: block;
+        margin: 2em auto;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        background: #faebad;
+        font-weight: 600;
+        color: #1f2937;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .reset-btn:hover {
+        background: #eab308;
+    }
+</style>
+</head>
+<body>
+<h1>C's Week: {{ week_dates[0].strftime('%B %d') }}</h1>
+
+<form class="add-form" method="POST" action="{{ url_for('add_habit') }}">
+    <input type="text" name="name" placeholder="Habit" required>
+    <input type="text" name="description" placeholder="Description (opt.)">
+    <select name="time_of_day">
+        <option value="⛅️">⛅️</option>
+        <option value="☀️">☀️</option>
+        <option value="🌇">🌇</option>
+        <option value="🌠">🌠</option>
+    </select>
+    <button type="submit">+</button>
+</form>
+
+<div class="tracker-container">
+    <!-- Table -->
+    <table>
+        <tr>
+            <th></th>
+            <th>Habit</th>
+            {% for d in week_dates %}
+                <th>{{ d.strftime('%a') }}</th>
+            {% endfor %}
+        </tr>
+        {% for habit in habits %}
+        {% set row_colors = {'⛅️':'#fffaf5','☀️':'#fff7ed','🌇':'#fef3f2','🌠':'#f3f4f6'} %}
+        <tr class="habit-row" style="background-color: {{ row_colors[habit.time_of_day] }}; border-radius: 8px;">
+            <td style="text-align:center; font-size:1.2em;">{{ habit.time_of_day }}</td>
+            <td>
+                {{ habit.name }}
+                <div class="ellipsis-container">
+                    <button class="ellipsis-btn" onclick="toggleMenu(event)">✎</button>
+                    <div class="menu">
+                        <a href="{{ url_for('edit_habit', habit_id=habit.id) }}">Edit</a>
+                        <form method="POST" action="{{ url_for('delete_habit', habit_id=habit.id) }}">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </td>
+            {% for d in week_dates %}
+            <td>
+                <form class="inline" method="POST" action="{{ url_for('toggle_completion') }}">
+                    <input type="hidden" name="habit_id" value="{{ habit.id }}">
+                    <input type="hidden" name="day" value="{{ d }}">
+                    <input type="checkbox" onchange="this.form.submit()"
+                           {% if completed_map.get((habit.id, d)) %}checked{% endif %}>
+                </form>
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- Progress card -->
+    <div class="progress-card">
+        <h3>Progress</h3>
+        {% for habit in habits %}
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ habit_progress[habit.id]*100 }}%;">
+                {{ (habit_progress[habit.id]*100)|round(0) }}%
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<form method="POST" action="{{ url_for('reset_week') }}">
+    <button class="reset-btn" type="submit">Reset Week</button>
+</form>
+
+<script>
+    function toggleMenu(event) {
+        event.stopPropagation(); // prevent click from propagating
+        const menu = event.target.nextElementSibling;
+    
+        // Close all other menus
+        document.querySelectorAll('.menu').forEach(m => {
+            if (m !== menu) {
+                m.style.display = 'none';
+            }
+        });
+    
+        // Toggle the clicked menu
+        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    }
+    
+    // Close menus when clicking outside
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.menu').forEach(menu => {
+            if (!menu.contains(e.target) && !menu.previousElementSibling.contains(e.target)) {
+                menu.style.display = 'none';
+            }
+        });
+    });
+    </script>
+    
+
+</body>
+</html>

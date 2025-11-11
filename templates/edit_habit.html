@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Edit Habit</title>
+<style>
+    body { font-family: 'Consolas', monospace; background: #fffaf5; max-width: 500px; margin: 3em auto; color: #333; }
+    form { font-family: 'Consolas', monospace; display: flex; flex-direction: column; gap: 12px; }
+    input, select { font-family: 'Consolas', monospace; padding: 8px 10px; border-radius: 8px; border: 1px solid #e5e7eb; font-size: 14px; }
+    button {font-family: 'Consolas', monospace; padding: 8px 16px; border: none; border-radius: 8px; background-color: #a78bfa; color: white; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    button:hover { font-family: 'Consolas', monospace; background-color: #7c3aed; }
+</style>
+</head>
+<body>
+<h2>Edit Habit</h2>
+<form method="POST" action="{{ url_for('edit_habit', habit_id=habit.id) }}">
+    <input type="text" name="name" value="{{ habit.name }}" required>
+    <input type="text" name="description" value="{{ habit.description }}" placeholder="Description (optional)">
+    <select name="time_of_day">
+        <option value="⛅️" {% if habit.time_of_day=='⛅️' %}selected{% endif %}>⛅️</option>
+        <option value="☀️" {% if habit.time_of_day=='☀️' %}selected{% endif %}>☀️</option>
+        <option value="🌇" {% if habit.time_of_day=='🌇' %}selected{% endif %}>🌇</option>
+        <option value="🌠" {% if habit.time_of_day=='🌠' %}selected{% endif %}>🌠</option>
+    </select>
+    <button type="submit">Save</button>
+</form>
+</body>
+</html>

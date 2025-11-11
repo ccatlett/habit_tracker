@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel</title>
+<style>
+    body {
+        font-family: 'Consolas', monospace;
+        background: #fffaf5;
+        color: #333;
+        max-width: 1000px;
+        margin: 2em auto;
+        line-height: 1.4;
+    }
+    h1 {
+        text-align: center;
+        font-weight: 600;
+        color: #7c3aed;
+        margin-bottom: 2em;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 2em;
+    }
+    th, td {
+        padding: 8px 12px;
+        border: 1px solid #e5e7eb;
+        text-align: left;
+    }
+    th {
+        background-color: #a78bfa;
+        color: white;
+    }
+    tr:nth-child(even) {
+        background-color: #f3f4f6;
+    }
+</style>
+</head>
+<body>
+<h1>Admin Panel: SQLite DB</h1>
+
+<h2>Habits</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Time of Day</th>
+        <th>Created At</th>
+    </tr>
+    {% for h in habits %}
+    <tr>
+        <td>{{ h.id }}</td>
+        <td>{{ h.name }}</td>
+        <td>{{ h.description }}</td>
+        <td>{{ h.time_of_day }}</td>
+        <td>{{ h.created_at }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h2>Completions</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Habit ID</th>
+        <th>Habit Name</th>
+        <th>Time of Day</th>
+        <th>Description</th>
+        <th>Date</th>
+        <th>Completed</th>
+    </tr>
+    {% for c in completions %}
+    <tr>
+        <td>{{ c.id }}</td>
+        <td>{{ c.habit_id }}</td>
+        <td>{{ c.name }}</td>
+        <td>{{ c.time_of_day }}</td>
+        <td>{{ c.description }}</td>
+        <td>{{ c.date }}</td>
+        <td>{{ c.completed }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
