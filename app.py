@@ -63,8 +63,37 @@ def index():
         completed_days = sum(1 for d in week_dates if completed_map.get((habit.id, d)))
         habit_progress[habit.id] = completed_days / 7  # fraction 0-1
 
-    return render_template('index.html', habits=habits, week_dates=week_dates,
-                           completed_map=completed_map, habit_progress=habit_progress)
+    # --- Compute last week's progress ---
+    last_week_dates = [d - timedelta(days=7) for d in week_dates]
+
+    last_week_progress = {}
+    for habit in habits:
+        completed_days_last = sum(
+            1 for d in last_week_dates if completed_map.get((habit.id, d))
+        )
+        last_week_progress[habit.id] = completed_days_last / 7
+
+    # --- Compute trend icon ---
+    trend_icon = {}
+    for habit in habits:
+        curr = habit_progress[habit.id]
+        last = last_week_progress[habit.id]
+
+        if curr > last:
+            trend_icon[habit.id] = "📈"   # improved
+        elif curr < last:
+            trend_icon[habit.id] = "📉"   # worse
+        else:
+            trend_icon[habit.id] = "➖"   # flat
+
+    return render_template(
+        'index.html',
+        habits=habits,
+        week_dates=week_dates,
+        completed_map=completed_map,
+        habit_progress=habit_progress,
+        trend_icon=trend_icon
+    )
 
 
 @app.route('/toggle', methods=['POST'])
@@ -162,4 +191,4 @@ with app.app_context():
 
 
 if __name__ == "__main__":
-     app.run(host='127.0.0.1', port=5000, debug=False)
+     app.run(host='127.0.0.1', port=8000, debug=False)

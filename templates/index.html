@@ -249,11 +249,14 @@
     <div class="progress-card">
         <h3>Progress</h3>
         {% for habit in habits %}
-        <div class="progress-bar">
-            <div class="progress-fill" style="width: {{ habit_progress[habit.id]*100 }}%;">
-                {{ (habit_progress[habit.id]*100)|round(0) }}%
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="progress-bar" style="flex: 1;">
+                <div class="progress-fill" style="width: {{ habit_progress[habit.id]*100 }}%;">
+                    {{ (habit_progress[habit.id]*100)|round(0) }}%
+                </div>
             </div>
-        </div>
+            <span style="font-size: 16px;">{{ trend_icon[habit.id] }}</span>
+        </div>        
         {% endfor %}
     </div>
 </div>
