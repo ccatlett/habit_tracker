@@ -63,28 +63,50 @@ def index():
         completed_days = sum(1 for d in week_dates if completed_map.get((habit.id, d)))
         habit_progress[habit.id] = completed_days / 7  # fraction 0-1
 
-    # --- Compute last week's progress ---
-    last_week_dates = [d - timedelta(days=7) for d in week_dates]
+    # Today and day-of-week index
+    today = date.today()
+    weekday_index = today.weekday()   # Monday=0, Sunday=6
 
+    # --- Compute "this week so far" dates ---
+    this_week_dates = week_dates[: weekday_index + 1]  
+    # week_dates is already your Mon–Sun list; this slices through today
+
+    # --- Compute "last week so far" dates ---
+    last_week_dates = [d - timedelta(days=7) for d in this_week_dates]
+
+
+    # --- Compute this week's progress (so far) ---
+    this_week_progress = {}
+    for habit in habits:
+        completed_days_this = sum(
+            1 for d in this_week_dates if completed_map.get((habit.id, d))
+        )
+        # divide by days-so-far
+        this_week_progress[habit.id] = completed_days_this / len(this_week_dates)
+
+
+    # --- Compute last week's progress (matching days only) ---
     last_week_progress = {}
     for habit in habits:
         completed_days_last = sum(
             1 for d in last_week_dates if completed_map.get((habit.id, d))
         )
-        last_week_progress[habit.id] = completed_days_last / 7
+        last_week_progress[habit.id] = completed_days_last / len(last_week_dates)
+
 
     # --- Compute trend icon ---
     trend_icon = {}
     for habit in habits:
-        curr = habit_progress[habit.id]
+        curr = this_week_progress[habit.id]
         last = last_week_progress[habit.id]
 
         if curr > last:
-            trend_icon[habit.id] = "📈"   # improved
+            trend_icon[habit.id] = "📈"
         elif curr < last:
-            trend_icon[habit.id] = "📉"   # worse
+            trend_icon[habit.id] = "📉"
         else:
-            trend_icon[habit.id] = "➖"   # flat
+            trend_icon[habit.id] = "➖"
+
 
     return render_template(
         'index.html',
